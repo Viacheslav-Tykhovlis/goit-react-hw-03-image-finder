@@ -1,6 +1,6 @@
 import React from 'react';
-import { Loader } from '../Loader/Loader';
 import { Button } from '../Button/Button';
+import { Loader } from '../Loader/Loader';
 import axios from 'axios';
 import { ImageGalleryItem } from '../ImageGalleryItem/ImageGalleryItem';
 import css from './ImageGallery.module.css';
@@ -13,24 +13,36 @@ export class ImageGallery extends React.Component {
     page: 1,
     images: [],
     loading: false,
-    activeImage: 0,
   };
 
   async componentDidUpdate(prevProps, prevState) {
-    if (
-      prevProps.textSearch !== this.props.textSearch ||
-      prevState.page !== this.state.page
-    ) {
+    if (prevProps.textSearch !== this.props.textSearch) {
+      await this.setState({ loading: true, page: 1, images: [] });
+      const { data } = await axios.get(
+        `?q=${this.props.textSearch}&page=${this.state.page}&key=${KEY}&image_type=photo&orientation=horizontal&per_page=12`
+      );
+      await this.setState({
+        images: data.hits,
+        loading: false,
+      });
+    }
+
+    if (prevState.page !== this.state.page && this.state.page !== 1) {
       this.setState({ loading: true });
       const { data } = await axios.get(
         `?q=${this.props.textSearch}&page=${this.state.page}&key=${KEY}&image_type=photo&orientation=horizontal&per_page=12`
       );
-
-      this.setState({
-        images: data,
+      this.setState(prevState => ({
+        images:
+          prevState.images.length > 0
+            ? [...prevState.images, ...data.hits]
+            : data.hits,
         loading: false,
-      });
-      this.props.getImages(this.state.images.hits);
+      }));
+    }
+
+    if (prevState.images !== this.state.images) {
+      this.props.getImages(this.state.images);
     }
   }
 
@@ -39,27 +51,24 @@ export class ImageGallery extends React.Component {
   };
 
   loadMore = () => {
-    console.log('саботало');
     this.setState(prevState => ({ page: prevState.page + 1 }));
   };
 
   render() {
     const { loading, images } = this.state;
-
     return (
       <>
-        {/* {!images.hits === undefined && <div>ничего нет</div>} */}
-        {this.state.loading && <Loader className={css.loader} />}
-        {!images.hits && !loading && (
+        {!images.length > 0 && !loading && (
           <div className={css.request}>Enter a request...</div>
         )}
         <ul className={css.imageGallery}>
           <ImageGalleryItem
-            sendImages={images.hits}
+            sendImages={images}
             openModal={this.getURL}
           ></ImageGalleryItem>
         </ul>
-        {images.hits && <Button loadMore={this.loadMore}></Button>}
+        {this.state.loading && <Loader />}
+        {images.length > 0 && <Button loadMore={this.loadMore}></Button>}
       </>
     );
   }

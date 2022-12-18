@@ -12,6 +12,7 @@
   list-style: none;
   margin-left: auto;
   margin-right: auto;
+  margin-bottom: 20px;
 }
 
 .request {
@@ -24,4 +25,5 @@
   width: auto;
   margin-right: auto;
   margin-left: auto;
+  text-align: center;
 }

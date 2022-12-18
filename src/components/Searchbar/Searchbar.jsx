@@ -14,12 +14,11 @@ export class Searchbar extends React.Component {
   handleSubmit = evt => {
     evt.preventDefault();
     if (this.state.inputText.trim() === '') {
-      // alert('Будь-ласка, заповніть поле пошуку');
+      alert('Будь-ласка, заповніть поле пошуку');
       return;
     }
 
     this.props.onSubmit(this.state.inputText);
-    this.setState({ inputText: '' });
   };
 
   render() {
@@ -35,8 +34,6 @@ export class Searchbar extends React.Component {
             className={css.searchFormInput}
             type="text"
             value={this.state.inputText}
-            // autocomplete="off"
-            // autofocus
             placeholder="Search images and photos"
             onChange={this.handleInput}
           />

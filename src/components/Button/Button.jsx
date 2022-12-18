@@ -1,13 +1,13 @@
 import React from 'react';
 import css from './Button.module.css';
 
-export const Button = () => {
+export const Button = ({ loadMore }) => {
   return (
     <button
       type="button"
       className={css.button}
       onClick={() => {
-        this.props.loadMore();
+        loadMore();
       }}
     >
       Load more

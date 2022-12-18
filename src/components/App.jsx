@@ -31,7 +31,7 @@ export class App extends React.Component {
   render() {
     return (
       <div>
-        <Searchbar onSubmit={this.handleFormSubmit}></Searchbar>
+        <Searchbar onSubmit={this.handleFormSubmit} />
 
         <ImageGallery
           textSearch={this.state.textInput}
