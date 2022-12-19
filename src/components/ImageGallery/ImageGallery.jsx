@@ -68,7 +68,7 @@ export class ImageGallery extends React.Component {
           ></ImageGalleryItem>
         </ul>
         {this.state.loading && <Loader />}
-        {images.length > 0 && <Button loadMore={this.loadMore}></Button>}
+        {images.length > 11 && <Button loadMore={this.loadMore}></Button>}
       </>
     );
   }
