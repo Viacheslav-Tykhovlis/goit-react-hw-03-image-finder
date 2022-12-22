@@ -1,13 +1,13 @@
 import React, { Children } from 'react';
-import axios from 'axios';
 import { Searchbar } from './Searchbar/Searchbar';
 import { ImageGallery } from './ImageGallery/ImageGallery';
 import { Loader } from './Loader/Loader';
 import { Button } from './Button/Button';
 import { Modal } from './Modal/Modal';
+import { getImages } from './API/API';
 
-axios.defaults.baseURL = 'https://pixabay.com/api/';
-const KEY = '30132115-7f2225df990f8cd81354d9436';
+// axios.defaults.baseURL = 'https://pixabay.com/api/';
+// const KEY = '30132115-7f2225df990f8cd81354d9436';
 
 export class App extends React.Component {
   state = {
@@ -23,13 +23,11 @@ export class App extends React.Component {
 
   async componentDidUpdate(prevProps, prevState) {
     if (prevState.textInput !== this.state.textInput) {
-      await this.setState({ loading: true, page: 1, currentImages: [] });
-      const { data } = await axios.get(
-        `?q=${this.state.textInput}&page=${this.state.page}&key=${KEY}&image_type=photo&orientation=horizontal&per_page=12`
-      );
+      this.setState({ loading: true, page: 1, currentImages: [] });
+      const data = await getImages(this.state.textInput, this.state.page);
       await this.setState({
         currentImages: data.hits,
-        amountPages: Math.ceil(data.total / 12),
+        amountPages: Math.ceil(data.totalHits / 12),
         loading: false,
         showLoadMore: true,
       });
@@ -37,15 +35,12 @@ export class App extends React.Component {
 
     if (prevState.page !== this.state.page && this.state.page !== 1) {
       this.setState({ loading: true });
-      const { data } = await axios.get(
-        `?q=${this.state.textInput}&page=${this.state.page}&key=${KEY}&image_type=photo&orientation=horizontal&per_page=12`
-      );
-      this.setState(prevState => ({
+      const data = await getImages(this.state.textInput, this.state.page);
+      await this.setState(prevState => ({
         currentImages: [...prevState.currentImages, ...data.hits],
         loading: false,
         showLoadMore: this.state.page < this.state.amountPages,
       }));
-      console.log(this.state.page < this.state.amountPages);
     }
   }
 
