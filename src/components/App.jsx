@@ -13,7 +13,6 @@ export class App extends React.Component {
   state = {
     textInput: '',
     currentImages: [],
-    amountPages: 1,
     showModal: false,
     largeImage: null,
     loading: false,
@@ -22,25 +21,20 @@ export class App extends React.Component {
   };
 
   async componentDidUpdate(prevProps, prevState) {
-    if (prevState.textInput !== this.state.textInput) {
-      this.setState({ loading: true, page: 1, currentImages: [] });
-      const data = await getImages(this.state.textInput, this.state.page);
-      await this.setState({
-        currentImages: data.hits,
-        amountPages: Math.ceil(data.totalHits / 12),
-        loading: false,
-        showLoadMore: true,
-      });
-    }
-
-    if (prevState.page !== this.state.page && this.state.page !== 1) {
+    if (
+      prevState.textInput !== this.state.textInput ||
+      prevState.page !== this.state.page
+    ) {
       this.setState({ loading: true });
       const data = await getImages(this.state.textInput, this.state.page);
-      await this.setState(prevState => ({
-        currentImages: [...prevState.currentImages, ...data.hits],
+      await this.setState({
+        currentImages:
+          this.state.page === 1
+            ? [...data.hits]
+            : [...prevState.currentImages, ...data.hits],
         loading: false,
-        showLoadMore: this.state.page < this.state.amountPages,
-      }));
+        showLoadMore: this.state.page < Math.ceil(data.totalHits / 12),
+      });
     }
   }
 
